@@ -2,7 +2,7 @@ name: Build feeds
 
 on:
   schedule:
-    - cron: "0 9 * * *"   # daily, 06:00 in Brazil
+    - cron: "0 */6 * * *"  # every 6 hours
   workflow_dispatch:       # "Run workflow" button
   push:
     branches: [main]
@@ -29,6 +29,8 @@ jobs:
           python-version: "3.12"
       - name: Build job feed
         run: python3 jobs_feed.py --report
+      - name: Build filtered YouTube feeds
+        run: python3 yt_filter.py
       - name: Save first-seen dates
         run: |
           git config user.name "github-actions[bot]"
@@ -39,9 +41,9 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p _site
-          cp jobs.xml _site/
+          cp *.xml _site/
           echo "feeds.augustodoregofranke.com" > _site/CNAME
-          printf '<!doctype html><meta charset="utf-8"><title>Feeds</title><ul><li><a href="jobs.xml">jobs.xml</a></li></ul>\n' > _site/index.html
+          printf '<!doctype html><meta charset="utf-8"><title>Feeds</title><ul><li><a href="jobs.xml">jobs.xml</a></li><li><a href="bt0.xml">bt0.xml</a></li></ul>\n' > _site/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
